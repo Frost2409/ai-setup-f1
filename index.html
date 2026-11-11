@@ -38,6 +38,8 @@ button.secondary{background:#253651;border:1px solid var(--line)}button.danger{b
 .community-item p{margin:3px 0;color:var(--muted)}.community-item small{color:#8ea2c4}
 .community-config{background:#0c1424;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
 .notice-box{background:#302716;border:1px solid #72572b;border-radius:12px;padding:12px;color:#f7dfac;font-size:13px}
+.community-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin:12px 0}.community-item button{white-space:nowrap}.coach-result strong{color:#8fcaff}
+@media(max-width:700px){.community-tools{grid-template-columns:1fr}}
 footer{color:var(--muted);font-size:12px;margin-top:18px}
 @media(max-width:760px){
   header{padding:18px 14px}h1{font-size:23px}
@@ -134,7 +136,7 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
     <section class="panel">
       <section class="coach">
         <h2>🧠 Ingegnere di pista AI</h2>
-        <p class="notice">Descrivi cosa senti al volante. L'assistente propone modifiche indicative all'assetto attualmente caricato; applicale una alla volta e verifica in pista.</p>
+        <p class="notice">Assistente tecnico locale: analizza i sintomi, propone correzioni e può generare una base di partenza. Funziona direttamente nel browser, anche offline: nessuna API, nessun server e nessun costo.</p>
         <div class="coach-grid">
           <div><label for="balance">Comportamento generale</label><select id="balance"><option value="neutral">Bilanciata</option><option value="under">Sottosterzo: non gira abbastanza</option><option value="over">Sovrasterzo: il posteriore scappa</option></select></div>
           <div><label for="phase">Quando succede?</label><select id="phase"><option value="entry">Ingresso curva / frenata</option><option value="mid">Centro curva</option><option value="exit">Uscita curva / accelerazione</option><option value="straight">Rettilineo / alta velocità</option><option value="all">In più fasi</option></select></div>
@@ -144,9 +146,9 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
           <div><label for="traction">In uscita</label><select id="traction"><option value="ok">Buona trazione</option><option value="spin">Perdo trazione / pattina</option><option value="snap">Scoda improvvisamente</option><option value="slow">Esce lenta dalla curva</option></select></div>
         </div>
         <label for="notes">Altre sensazioni (facoltativo)</label><input id="notes" placeholder="Es. instabile nelle curve lente...">
-        <div class="actions"><button id="coachBtn">Analizza feedback</button><button class="secondary" id="applyCoach" disabled>Applica suggerimenti</button></div>
+        <div class="actions"><button id="coachBtn">Analizza feedback</button><button class="secondary" id="applyCoach" disabled>Applica suggerimenti</button><button class="secondary" id="generateBase">Genera assetto base</button></div>
         <div class="coach-result" id="coachResult" aria-live="polite">Compila le sensazioni e premi “Analizza feedback”.</div>
-        <p class="notice">L'assistente usa regole tecniche indicative: non legge telemetria né comunica direttamente con la PS5. I suggerimenti vanno testati.</p>
+        <p class="notice">Motore di regole e calcoli eseguito sul dispositivo: non è un modello generativo e non legge la telemetria della PS5. I valori sono una base indicativa: controlla gli intervalli del gioco e verifica in pista.</p>
       </section>
     </section>
   </section>
@@ -155,7 +157,7 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
     <section class="panel">
       <h2>🌐 Community setup</h2>
       <p class="muted">Qui potrai pubblicare i tuoi assetti e scaricare quelli condivisi dagli altri giocatori, senza mostrare nome, email o altri dati personali.</p>
-      <div class="notice-box"><strong>Collegamento da completare:</strong> GitHub Pages ospita l'app ma non conserva un archivio condiviso. Per la community serve un database online separato. Possiamo collegare un progetto Supabase gratuito; finché non viene configurato, la condivisione online non è attiva.</div>
+      <div class="notice-box"><strong>Community online collegata a Supabase.</strong> L'Ingegnere AI invece funziona offline. La condivisione Community richiede Internet e usa la chiave pubblica del progetto.</div>
       <div class="community-config">
         <h3>Collega il database della community</h3>
         <label for="supabaseUrl">URL progetto Supabase</label><input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co">
@@ -168,6 +170,8 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
       <div class="actions"><button id="publishCommunity">Pubblica assetto online</button><button class="secondary" id="refreshCommunity">Aggiorna elenco community</button></div>
       <p id="communityStatus" class="status" aria-live="polite">Community non ancora configurata.</p>
       <h3 style="margin-top:22px">Assetti condivisi dagli altri</h3>
+      <div class="community-tools"><input id="communitySearch" type="search" placeholder="Cerca titolo o circuito..."><select id="filterGame"><option value="">Tutti i giochi</option><option>F1 25 (stagione 2025)</option><option>F1 25 + 2026 Season Pack</option></select><select id="filterWeather"><option value="">Tutti i meteo</option><option>Asciutto</option><option>Bagnato</option></select></div>
+      <p class="notice">I ❤️ sono salvati solo su questo dispositivo e non rappresentano voti pubblici.</p>
       <div id="communityList"><p class="muted">Configura il database e premi “Aggiorna elenco community”.</p></div>
     </section>
   </section>
@@ -210,6 +214,66 @@ $("export").onclick=()=>{let blob=new Blob([JSON.stringify(all(),null,2)],{type:
 $("importBtn").onclick=()=>$("importFile").click();
 $("importFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x||typeof x!=="object"||Array.isArray(x))throw Error();localStorage.setItem("aisetupf1",JSON.stringify({...all(),...x}));render();$("status").textContent="Backup importato ✓"}catch{$("status").textContent="File JSON non valido"}e.target.value=""};
 render();
+
+// INGEGNERE LOCALE: regole e calcoli eseguiti nel browser, senza API o server.
+let coachChanges = null;
+const num = v => { const raw=String(v??"").trim(); if(!raw)return null; const n=Number(raw.replace(",",".")); return Number.isFinite(n)?n:null; };
+function setupValue(name){return num(fields()[name]);}
+function buildCoachAdvice(){
+  const balance=$("balance").value, phase=$("phase").value, corner=$("corner").value;
+  const severity=$("severity").value, braking=$("braking").value, traction=$("traction").value;
+  const factor=severity==="strong"?2:severity==="medium"?1.5:1;
+  const wet=$("weather").value==="Bagnato";
+  const changes={}, reasons=[];
+  function adjust(name,delta,min,max,fallback){
+    const old=setupValue(name), prior=changes[name]?.next, start=prior??(old===null?fallback:old);
+    const next=Math.max(min,Math.min(max,Math.round((start+delta*factor)*100)/100));
+    if(old===null || next!==old) changes[name]={old:changes[name]?.old??(old===null?"non impostato":old),next};
+  }
+  if(balance==="under"){
+    if(phase==="mid"||phase==="all"){adjust("Ala anteriore",2,0,50,28);reasons.push("Sottosterzo al centro: aumenta leggermente il carico anteriore.");}
+    if(phase==="entry"||phase==="all"){adjust("Differenziale in rilascio",-5,10,100,50);adjust("Freno motore",-3,0,100,50);reasons.push("Ingresso curva: rendi il retrotreno un po' più libero in rilascio.");}
+    if(phase==="exit"){adjust("Differenziale in accelerazione",-5,10,100,55);reasons.push("Uscita curva: riduci il differenziale in accelerazione per aiutare la rotazione.");}
+  }
+  if(balance==="over"){
+    if(phase==="mid"||phase==="all"){adjust("Ala anteriore",-2,0,50,28);adjust("Ala posteriore",2,0,50,32);reasons.push("Sovrasterzo in percorrenza: sposta leggermente il bilanciamento aerodinamico verso il posteriore.");}
+    if(phase==="entry"||phase==="all"){adjust("Differenziale in rilascio",5,10,100,50);adjust("Freno motore",-3,0,100,50);reasons.push("Ingresso curva: aumenta un poco la stabilità al rilascio.");}
+    if(phase==="exit"){adjust("Differenziale in accelerazione",5,10,100,55);reasons.push("Uscita curva: aumenta leggermente il differenziale in accelerazione per stabilizzare la trazione.");}
+  }
+  if(braking==="lock"){adjust("Pressione freni",-3,80,100,96);reasons.push("Bloccaggio: riduci di poco la pressione dei freni.");}
+  if(braking==="rear"){adjust("Ripartizione frenata",2,50,70,55);reasons.push("Retrotreno instabile in frenata: sposta la ripartizione leggermente in avanti.");}
+  if(braking==="long"){adjust("Pressione freni",2,80,100,96);reasons.push("Spazio di frenata lungo: aumenta leggermente la pressione, controllando i bloccaggi.");}
+  if(traction==="spin"){adjust("Differenziale in accelerazione",-5,10,100,55);adjust("Barra antirollio posteriore",-2,1,21,8);reasons.push("Pattinamento: cerca più progressività in trazione e un posteriore meno rigido.");}
+  if(traction==="snap"){adjust("Differenziale in accelerazione",5,10,100,55);adjust("Sospensione posteriore",-2,1,41,20);reasons.push("Scodata improvvisa: aumenta un poco la stabilità al gas e ammorbidisci il posteriore.");}
+  if(traction==="slow"){adjust("Differenziale in accelerazione",-3,10,100,55);reasons.push("Uscita lenta: prova un differenziale in accelerazione leggermente più aperto.");}
+  if(corner==="slow"&&(balance==="under"||traction==="slow")){adjust("Ala anteriore",1,0,50,28);reasons.push("Curve lente: una piccola modifica all'anteriore può aiutare la rotazione.");}
+  if(corner==="fast"&&balance==="over"){adjust("Ala posteriore",2,0,50,32);reasons.push("Curve veloci: privilegia la stabilità aerodinamica.");}
+  if(wet){reasons.push("Bagnato: procedi con variazioni più piccole e privilegia la stabilità.");}
+  if(!reasons.length)reasons.push("Non emerge un problema specifico. Mantieni l'assetto e modifica un solo parametro alla volta dopo un giro di riferimento.");
+  return {changes,reasons};
+}
+$("coachBtn").addEventListener("click",()=>{
+  const result=buildCoachAdvice();coachChanges=result.changes;
+  const lines=result.reasons.map(x=>"• "+x);
+  const edits=Object.entries(coachChanges);
+  if(edits.length){lines.push("","MODIFICHE PROPOSTE:",...edits.map(([name,v])=>`• ${name}: ${v.old} → ${v.next}`));$("applyCoach").disabled=false;}
+  else{$("applyCoach").disabled=true;}
+  $("coachResult").textContent=lines.join("\n")+"\n\nSuggerimenti indicativi: applica e prova in pista.";
+});
+$("applyCoach").addEventListener("click",()=>{
+  if(!coachChanges)return;const values=fields();Object.entries(coachChanges).forEach(([name,v])=>values[name]=String(v.next));put(values);$("status").textContent="Suggerimenti Ingegnere applicati · non ancora salvato";$("applyCoach").disabled=true;showTab("setup");
+});
+$("generateBase").addEventListener("click",()=>{
+  const track=$("track").value.toLowerCase(),wet=$("weather").value==="Bagnato",race=$("session").value!=="Qualifica";
+  const low=/monza|baku|las vegas|spa|silverstone|jeddah/.test(track),high=/monaco|hungar|singapore|zandvoort|madrid/.test(track);
+  let front=low?18:high?42:30, rear=low?22:high?48:34;
+  if(wet){front+=4;rear+=5;}
+  const base={"Ala anteriore":front,"Ala posteriore":rear,"Differenziale in accelerazione":wet?48:race?52:58,"Differenziale in rilascio":wet?48:52,"Freno motore":wet?45:55,"Campanatura anteriore":-3.0,"Campanatura posteriore":-1.5,"Convergenza anteriore":0.05,"Convergenza posteriore":0.20,"Sospensione anteriore":wet?25:32,"Sospensione posteriore":wet?8:10,"Barra antirollio anteriore":wet?7:10,"Barra antirollio posteriore":wet?5:8,"Altezza anteriore":wet?24:22,"Altezza posteriore":wet?48:45,"Pressione freni":wet?96:100,"Ripartizione frenata":wet?56:55,"Pressione anteriore sinistra":wet?23.0:24.0,"Pressione anteriore destra":wet?23.0:24.0,"Pressione posteriore sinistra":wet?21.5:22.5,"Pressione posteriore destra":wet?21.5:22.5};
+  base["Ripartizione frenata"]=wet?56:55;
+  put(base);coachChanges=null;$("applyCoach").disabled=true;$("status").textContent="Base generata dall'Ingegnere · non ancora salvata";
+  $("coachResult").textContent=`Base indicativa generata per ${$("track").value}, ${$("weather").value.toLowerCase()}, ${$("session").value.toLowerCase()}.\nCarico aerodinamico: ${low?"basso":high?"alto":"medio"}.\nControlla tutti gli intervalli nel gioco, poi salva nel Garage. Questa è una base euristica, non un setup telemetrico verificato.`;
+  showTab("setup");
+});
 </script>
 
 <script>
@@ -270,26 +334,47 @@ $("publishCommunity")?.addEventListener("click",async()=>{
     await loadCommunity();
   }catch(e){communityStatus(e.message,true);}
 });
+let communityRows=[];
+const LOCAL_LIKES_KEY="aisetupf1_community_likes";
+function localLikes(){try{return JSON.parse(localStorage.getItem(LOCAL_LIKES_KEY)||"{}")}catch{return {}}}
+function renderCommunity(){
+  const q=($("communitySearch")?.value||"").trim().toLowerCase();
+  const gameFilter=$("filterGame")?.value||"", weatherFilter=$("filterWeather")?.value||"";
+  const likes=localLikes();
+  const rows=communityRows.filter(r=>(!q||`${r.title} ${r.track} ${r.game}`.toLowerCase().includes(q))&&(!gameFilter||r.game===gameFilter)&&(!weatherFilter||r.weather===weatherFilter));
+  const root=$("communityList");
+  if(!rows.length){root.innerHTML="<p class='muted'>Nessun assetto trovato con questi filtri.</p>";return;}
+  root.innerHTML=rows.map(r=>`<article class="community-item"><div><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.game)} · ${escapeHtml(r.track)} · ${escapeHtml(r.weather)} · ${escapeHtml(r.session)}</p><small>Codice: ${escapeHtml(String(r.id))}</small></div><div class="actions" style="margin:0"><button class="secondary" data-like-id="${escapeHtml(String(r.id))}">${likes[r.id]?"♥":"♡"} ${likes[r.id]?"Piace":"Mi piace"}</button><button class="secondary" data-community-id="${escapeHtml(String(r.id))}">Importa</button></div></article>`).join("");
+  root.querySelectorAll("[data-community-id]").forEach(btn=>btn.addEventListener("click",()=>{
+    const r=rows.find(x=>String(x.id)===btn.dataset.communityId);if(!r)return;
+    $("game").value=r.game;updateTracks();$("track").value=r.track;$("weather").value=r.weather;$("session").value=r.session;
+    put(r.setup||{});$("status").textContent="Assetto community caricato (non ancora salvato)";
+    showTab("setup");communityStatus("Assetto importato nell'editor. Controllalo e poi salvalo.");
+  }));
+  root.querySelectorAll("[data-like-id]").forEach(btn=>btn.addEventListener("click",()=>{const l=localLikes(),id=btn.dataset.likeId;if(l[id])delete l[id];else l[id]=true;localStorage.setItem(LOCAL_LIKES_KEY,JSON.stringify(l));renderCommunity();}));
+}
 async function loadCommunity(){
   try{
     const rows=await communityRequest("community_setups?select=id,title,game,track,weather,session,setup,created_at&order=created_at.desc&limit=50");
-    const root=$("communityList");
-    if(!rows.length){root.innerHTML="<p class='muted'>Non ci sono ancora assetti condivisi. Puoi essere il primo!</p>";return;}
-    root.innerHTML=rows.map(r=>`<article class="community-item"><div><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.game)} · ${escapeHtml(r.track)} · ${escapeHtml(r.weather)} · ${escapeHtml(r.session)}</p><small>Codice: ${escapeHtml(String(r.id))}</small></div><button class="secondary" data-community-id="${escapeHtml(String(r.id))}">Importa</button></article>`).join("");
-    root.querySelectorAll("[data-community-id]").forEach(btn=>btn.addEventListener("click",()=>{
-      const r=rows.find(x=>String(x.id)===btn.dataset.communityId);if(!r)return;
-      $("game").value=r.game;updateTracks();$("track").value=r.track;$("weather").value=r.weather;$("session").value=r.session;
-      put(r.setup||{});$("status").textContent="Assetto community caricato (non ancora salvato)";
-      showTab("setup");communityStatus("Assetto importato nell'editor. Controllalo e poi salvalo.");
-    }));
+    communityRows=Array.isArray(rows)?rows:[];renderCommunity();
+    communityStatus(`Community aggiornata: ${communityRows.length} assetti caricati.`);
   }catch(e){$("communityList").innerHTML="<p class='muted'>"+escapeHtml(e.message)+"</p>";}
 }
+$("communitySearch")?.addEventListener("input",renderCommunity);
+$("filterGame")?.addEventListener("change",renderCommunity);
+$("filterWeather")?.addEventListener("change",renderCommunity);
+let communityRefreshTimer=null;
+
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 $("refreshCommunity")?.addEventListener("click",loadCommunity);
 function showTab(name){
   document.querySelectorAll(".tab-page").forEach(p=>p.hidden=p.id!=="page-"+name);
   document.querySelectorAll(".tab-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
-  if(name==="community")loadCommunity();
+  if(communityRefreshTimer){clearInterval(communityRefreshTimer);communityRefreshTimer=null;}
+  if(name==="community"){
+    loadCommunity();
+    communityRefreshTimer=setInterval(()=>{if(!document.hidden&&!$("page-community").hidden)loadCommunity();},30000);
+  }
   window.scrollTo({top:0,behavior:"smooth"});
 }
 document.querySelectorAll(".tab-button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
