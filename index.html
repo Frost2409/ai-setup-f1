@@ -35,8 +35,8 @@ button.secondary{background:#253651;border:1px solid var(--line)}button.danger{b
 .coach-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .coach label{margin-top:8px}.coach-result{white-space:pre-wrap;background:#0c1424;border:1px solid var(--line);padding:12px;border-radius:10px;margin-top:12px;color:#e6eaff}
 .saved-item,.community-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}
-.community-item p{margin:3px 0;color:var(--muted)}.community-item small{color:#8ea2c4}
-.community-config{background:#0c1424;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.community-item p{margin:3px 0;color:var(--muted)}.community-item small{color:#8ea2c4}.community-item .owner-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.community-item button.danger{background:#542b43}
+.community-config,.community-auth{background:#0c1424;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}.community-auth{border-color:#526da0}.owner-actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}.community-auth button{flex:1 1 170px}
 .notice-box{background:#302716;border:1px solid #72572b;border-radius:12px;padding:12px;color:#f7dfac;font-size:13px}
 .community-tools{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin:12px 0}.community-item button{white-space:nowrap}.coach-result strong{color:#8fcaff}
 @media(max-width:700px){.community-tools{grid-template-columns:1fr}}
@@ -163,14 +163,32 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
     <section class="panel">
       <h2>🌐 Community setup</h2>
       <p class="muted">Qui potrai pubblicare i tuoi assetti e scaricare quelli condivisi dagli altri giocatori, senza mostrare nome, email o altri dati personali.</p>
-      <div class="notice-box"><strong>Community online collegata a Supabase.</strong> L'Ingegnere AI invece funziona offline. La condivisione Community richiede Internet e usa la chiave pubblica del progetto.</div>
+      <div class="notice-box"><strong>Community online collegata a Supabase.</strong> L'Ingegnere AI invece funziona offline. Per pubblicare ed eliminare i propri assetti è necessaria l’identità anonima Supabase e la relativa policy SQL.</div>
       <div class="community-config">
         <h3>Collega il database della community</h3>
         <label for="supabaseUrl">URL progetto Supabase</label><input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co">
         <label for="supabaseKey">Chiave anon / publishable del progetto</label><input id="supabaseKey" type="password" placeholder="Incolla la chiave pubblica del progetto">
         <div class="actions"><button id="saveCommunityConfig">Salva collegamento</button><button class="secondary" id="testCommunity">Verifica connessione</button></div>
-        <p class="notice">La chiave pubblica è destinata all'uso nel browser. Non inserire mai service_role, password o chiavi segrete. Le regole del database devono limitare i dati pubblicabili.</p>
+        <p class="notice">La chiave pubblica è destinata all'uso nel browser. Non inserire mai service_role, password o chiavi segrete. Per gestire i propri assetti la Community crea un’identità anonima salvata in questo browser: se cancelli i dati del browser o cambi dispositivo, non potrai più eliminare i vecchi contributi.</p>
       </div>
+      <div class="community-auth" id="communityAuthPanel">
+        <h3>🔐 Accedi alla Community</h3>
+        <p class="notice">Per pubblicare, importare o consultare gli assetti devi accedere. Non esiste accesso anonimo.</p>
+        <div class="actions">
+          <button id="loginGoogle">Continua con Google</button>
+          <button id="loginApple" class="secondary">Continua con Apple</button>
+        </div>
+        <label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" placeholder="nome@esempio.it">
+        <label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Almeno 6 caratteri">
+        <div class="actions"><button id="emailRegister">Crea account email</button><button id="emailLogin" class="secondary">Accedi con email</button></div>
+        <label for="authPhone">Numero di telefono (formato internazionale, es. +393331234567)</label><input id="authPhone" type="tel" autocomplete="tel" placeholder="+39...">
+        <div class="actions"><button id="sendPhoneCode">Invia codice SMS</button></div>
+        <label for="authSmsCode">Codice ricevuto via SMS</label><input id="authSmsCode" inputmode="numeric" autocomplete="one-time-code" placeholder="Codice di verifica">
+        <div class="actions"><button id="verifyPhoneCode" class="secondary">Verifica codice e accedi</button></div>
+        <div class="actions"><button id="logoutCommunity" class="danger" hidden>Esci dall'account</button></div>
+        <p id="authStatus" class="notice" aria-live="polite">Collega Supabase per attivare l'accesso.</p>
+      </div>
+      <div id="communityMembersOnly" hidden>
       <h3>Condividi l'assetto attualmente selezionato</h3>
       <label for="communityTitle">Titolo pubblico (non usare nome, email o dati personali)</label><input id="communityTitle" maxlength="50" placeholder="Es. Monza asciutto - gara">
       <div class="actions"><button id="publishCommunity">Pubblica assetto online</button><button class="secondary" id="refreshCommunity">Aggiorna elenco community</button></div>
@@ -178,7 +196,8 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
       <h3 style="margin-top:22px">Assetti condivisi dagli altri</h3>
       <div class="community-tools"><input id="communitySearch" type="search" placeholder="Cerca titolo o circuito..."><select id="filterGame"><option value="">Tutti i giochi</option><option>F1 25 (stagione 2025)</option><option>F1 25 + 2026 Season Pack</option></select><select id="filterWeather"><option value="">Tutti i meteo</option><option>Asciutto</option><option>Bagnato</option></select></div>
       <p class="notice">I ❤️ sono salvati solo su questo dispositivo e non rappresentano voti pubblici.</p>
-      <div id="communityList"><p class="muted">Configura il database e premi “Aggiorna elenco community”.</p></div>
+      <div id="communityList"><p class="muted">Accedi per consultare la Community.</p></div>
+      </div>
     </section>
   </section>
 
@@ -318,109 +337,98 @@ $("generateSetup").addEventListener("click",generateTrackSetup);
 $("goGarage").addEventListener("click",()=>showTab("garage"));
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }
 
-// Community sharing: requires a Supabase project configured by the owner.
+// Community v6.3: accesso obbligatorio con account verificabile (mai anonimo).
 const COMMUNITY_CONFIG_KEY = "aisetupf1_community_config";
-function communityConfig(){ try{return JSON.parse(localStorage.getItem(COMMUNITY_CONFIG_KEY)||"{}")}catch{return {}} }
-function communityStatus(message, bad=false){
-  const el=$("communityStatus");
-  if(el){el.textContent=message;el.style.color=bad?"#ff9aa9":"var(--green)"}
-}
-function refreshCommunityConfig(){
+let supabaseClient = null;
+let currentCommunityUserId = null;
+let communityRows = [];
+let communityRefreshTimer = null;
+const LOCAL_LIKES_KEY = "aisetupf1_community_likes";
+function communityConfig(){try{return JSON.parse(localStorage.getItem(COMMUNITY_CONFIG_KEY)||"{}")}catch{return {}}}
+function communityStatus(message,bad=false){const el=$("communityStatus");if(el){el.textContent=message;el.style.color=bad?"#ff9aa9":"var(--green)"}}
+function authStatus(message,bad=false){const el=$("authStatus");if(el){el.textContent=message;el.style.color=bad?"#ff9aa9":"var(--green)"}}
+function refreshCommunityConfig(){const c=communityConfig();if($("supabaseUrl"))$("supabaseUrl").value=c.url||"";if($("supabaseKey"))$("supabaseKey").value=c.key||"";communityStatus(c.url&&c.key?"Configurazione inserita. Verifica la connessione e accedi.":"Per usare la Community collega prima il progetto Supabase.");}
+function initCommunityClient(){
   const c=communityConfig();
-  if($("supabaseUrl"))$("supabaseUrl").value=c.url||"";
-  if($("supabaseKey"))$("supabaseKey").value=c.key||"";
-  communityStatus(c.url&&c.key?"Configurazione inserita. Premi “Verifica connessione”.":"Per condividere online serve collegare un database gratuito Supabase.");
-}
-$("saveCommunityConfig")?.addEventListener("click",()=>{
-  const url=$("supabaseUrl").value.trim().replace(/\/+$/,"");
-  const keyVal=$("supabaseKey").value.trim();
-  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)||keyVal.length<20){
-    communityStatus("Indirizzo o chiave non validi. Controlla i dati del progetto Supabase.",true);return;
+  if(!c.url||!c.key){supabaseClient=null;authStatus("Inserisci prima URL e chiave pubblica Supabase.",true);return null;}
+  if(!window.supabase?.createClient){supabaseClient=null;authStatus("Libreria di accesso non caricata. Controlla la connessione Internet e ricarica la pagina.",true);return null;}
+  if(!supabaseClient){
+    supabaseClient=window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"pkce"}});
+    supabaseClient.auth.onAuthStateChange((event,session)=>{
+      currentCommunityUserId=session?.user?.id||null;
+      updateCommunityAuthUI(session);
+      if(session){setTimeout(()=>loadCommunity(),0);}else{communityRows=[];const list=$("communityList");if(list)list.innerHTML="<p class='muted'>Accedi per consultare la Community.</p>";}
+    });
   }
-  localStorage.setItem(COMMUNITY_CONFIG_KEY,JSON.stringify({url,key:keyVal}));
-  communityStatus("Configurazione salvata su questo dispositivo. Ora verifica la connessione.");
-});
-async function communityRequest(path, options={}){
-  const c=communityConfig();
-  if(!c.url||!c.key)throw Error("Prima configura il collegamento a Supabase.");
-  const response=await fetch(c.url+"/rest/v1/"+path,{
-    ...options,
-    headers:{
-      "apikey":c.key,"Authorization":"Bearer "+c.key,
-      "Content-Type":"application/json","Prefer":options.method==="POST"?"return=representation":"",...(options.headers||{})
-    }
-  });
-  if(!response.ok)throw Error("Il server ha risposto con errore "+response.status+". Controlla tabella e permessi.");
+  return supabaseClient;
+}
+function updateCommunityAuthUI(session){
+  const signed=!!session?.user?.id;
+  currentCommunityUserId=session?.user?.id||null;
+  $("communityMembersOnly").hidden=!signed;
+  $("logoutCommunity").hidden=!signed;
+  ["loginGoogle","loginApple","emailRegister","emailLogin","sendPhoneCode","verifyPhoneCode"].forEach(id=>{if($(id))$(id).disabled=signed;});
+  ["authEmail","authPassword","authPhone","authSmsCode"].forEach(id=>{if($(id))$(id).disabled=signed;});
+  if(signed){const u=session.user;authStatus("Accesso effettuato · "+(u.email||u.phone||"account verificato"));communityStatus("Account collegato. Puoi pubblicare e gestire i tuoi assetti.");}
+  else authStatus("Accedi con Google, Apple, email o numero di telefono.");
+}
+async function getCommunitySession(){
+  if(!supabaseClient)throw Error("Configura prima il collegamento a Supabase.");
+  const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;
+  if(!data.session)throw Error("Devi accedere con Google, Apple, email o telefono per usare la Community.");
+  currentCommunityUserId=data.session.user.id;return data.session;
+}
+async function communityRequest(path,options={}){
+  const c=communityConfig();if(!c.url||!c.key)throw Error("Prima configura il collegamento a Supabase.");
+  const session=await getCommunitySession();
+  const response=await fetch(c.url+"/rest/v1/"+path,{...options,headers:{"apikey":c.key,"Authorization":"Bearer "+session.access_token,"Content-Type":"application/json","Prefer":options.method==="POST"?"return=representation":"",...(options.headers||{})}});
+  if(!response.ok){const detail=await response.text().catch(()=>"");throw Error("Supabase ha risposto con errore "+response.status+(detail?": "+detail.slice(0,240):"."));}
   return response.status===204?[]:await response.json();
 }
-$("testCommunity")?.addEventListener("click",async()=>{
-  try{await communityRequest("community_setups?select=id&limit=1");communityStatus("Connessione riuscita! La community è raggiungibile.");}
-  catch(e){communityStatus(e.message,true);}
-});
-$("publishCommunity")?.addEventListener("click",async()=>{
-  try{
-    const title=$("communityTitle").value.trim();
-    if(!title||title.length>50)throw Error("Inserisci un titolo da 1 a 50 caratteri.");
-    const payload={
-      title,game:$("game").value,track:$("track").value,weather:$("weather").value,
-      session:$("session").value,setup:fields()
-    };
-    const rows=await communityRequest("community_setups",{method:"POST",body:JSON.stringify(payload)});
-    communityStatus("Assetto condiviso con la community! Codice: "+(rows[0]?.id||"pubblicato"));
-    $("communityTitle").value="";
-    await loadCommunity();
-  }catch(e){communityStatus(e.message,true);}
-});
-let communityRows=[];
-const LOCAL_LIKES_KEY="aisetupf1_community_likes";
+function showAuthError(e){authStatus(e?.message||"Operazione non riuscita.",true);}
+async function emailRegister(){try{const c=initCommunityClient();if(!c)return;const email=$("authEmail").value.trim(),password=$("authPassword").value;if(!email||password.length<6)throw Error("Inserisci un'email valida e una password di almeno 6 caratteri.");const {data,error}=await c.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;if(data.session){updateCommunityAuthUI(data.session);authStatus("Account creato e accesso effettuato.");}else authStatus("Registrazione avviata. Controlla la casella email e conferma l'indirizzo prima di accedere.");}catch(e){showAuthError(e);}}
+async function emailLogin(){try{const c=initCommunityClient();if(!c)return;const email=$("authEmail").value.trim(),password=$("authPassword").value;if(!email||!password)throw Error("Inserisci email e password.");const {data,error}=await c.auth.signInWithPassword({email,password});if(error)throw error;updateCommunityAuthUI(data.session);authStatus("Accesso effettuato.");}catch(e){showAuthError(e);}}
+async function oauthLogin(provider){try{const c=initCommunityClient();if(!c)return;const {error}=await c.auth.signInWithOAuth({provider,options:{redirectTo:location.origin+location.pathname}});if(error)throw error;}catch(e){showAuthError(e);}}
+async function sendPhoneCode(){try{const c=initCommunityClient();if(!c)return;const phone=$("authPhone").value.trim();if(!/^\+[1-9]\d{7,14}$/.test(phone))throw Error("Inserisci il numero in formato internazionale, ad esempio +393331234567.");const {error}=await c.auth.signInWithOtp({phone,options:{channel:"sms"}});if(error)throw error;authStatus("Codice SMS inviato. Inseriscilo qui sotto.");}catch(e){showAuthError(e);}}
+async function verifyPhoneCode(){try{const c=initCommunityClient();if(!c)return;const phone=$("authPhone").value.trim(),token=$("authSmsCode").value.trim();if(!phone||!token)throw Error("Inserisci il numero e il codice SMS.");const {data,error}=await c.auth.verifyOtp({phone,token,type:"sms"});if(error)throw error;updateCommunityAuthUI(data.session);authStatus("Numero verificato: accesso effettuato.");}catch(e){showAuthError(e);}}
+$("saveCommunityConfig")?.addEventListener("click",()=>{const url=$("supabaseUrl").value.trim().replace(/\/+$/,""),keyVal=$("supabaseKey").value.trim();if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)||keyVal.length<20){communityStatus("Indirizzo o chiave non validi. Controlla i dati Supabase.",true);return;}localStorage.setItem(COMMUNITY_CONFIG_KEY,JSON.stringify({url,key:keyVal}));supabaseClient=null;initCommunityClient();communityStatus("Collegamento salvato. Ora verifica la connessione e configura i metodi di accesso in Supabase.");});
+$("testCommunity")?.addEventListener("click",async()=>{try{const c=initCommunityClient();if(!c)return;const {data,error}=await c.auth.getSession();if(error)throw error;if(!data.session)throw Error("Connessione al progetto riuscita. Accedi per verificare anche la tabella Community.");const {error:dbError}=await c.from("community_setups").select("id",{head:true,count:"exact"}).limit(1);if(dbError)throw dbError;communityStatus("Connessione Supabase e tabella Community verificate.");}catch(e){communityStatus(e.message,true);}});
+$("emailRegister")?.addEventListener("click",emailRegister);
+$("emailLogin")?.addEventListener("click",emailLogin);
+$("loginGoogle")?.addEventListener("click",()=>oauthLogin("google"));
+$("loginApple")?.addEventListener("click",()=>oauthLogin("apple"));
+$("sendPhoneCode")?.addEventListener("click",sendPhoneCode);
+$("verifyPhoneCode")?.addEventListener("click",verifyPhoneCode);
+$("logoutCommunity")?.addEventListener("click",async()=>{try{const c=initCommunityClient();if(!c)return;const {error}=await c.auth.signOut();if(error)throw error;updateCommunityAuthUI(null);authStatus("Sei uscito dall'account.");}catch(e){showAuthError(e);}});
 function localLikes(){try{return JSON.parse(localStorage.getItem(LOCAL_LIKES_KEY)||"{}")}catch{return {}}}
 function renderCommunity(){
-  const q=($("communitySearch")?.value||"").trim().toLowerCase();
-  const gameFilter=$("filterGame")?.value||"", weatherFilter=$("filterWeather")?.value||"";
-  const likes=localLikes();
+  const root=$("communityList");if(!currentCommunityUserId){root.innerHTML="<p class='muted'>Accedi per consultare la Community.</p>";return;}
+  const q=($("communitySearch")?.value||"").trim().toLowerCase(),gameFilter=$("filterGame")?.value||"",weatherFilter=$("filterWeather")?.value||"",likes=localLikes();
   const rows=communityRows.filter(r=>(!q||`${r.title} ${r.track} ${r.game}`.toLowerCase().includes(q))&&(!gameFilter||r.game===gameFilter)&&(!weatherFilter||r.weather===weatherFilter));
-  const root=$("communityList");
   if(!rows.length){root.innerHTML="<p class='muted'>Nessun assetto trovato con questi filtri.</p>";return;}
-  root.innerHTML=rows.map(r=>`<article class="community-item"><div><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.game)} · ${escapeHtml(r.track)} · ${escapeHtml(r.weather)} · ${escapeHtml(r.session)}</p><small>Codice: ${escapeHtml(String(r.id))}</small></div><div class="actions" style="margin:0"><button class="secondary" data-like-id="${escapeHtml(String(r.id))}">${likes[r.id]?"♥":"♡"} ${likes[r.id]?"Piace":"Mi piace"}</button><button class="secondary" data-community-id="${escapeHtml(String(r.id))}">Importa</button></div></article>`).join("");
-  root.querySelectorAll("[data-community-id]").forEach(btn=>btn.addEventListener("click",()=>{
-    const r=rows.find(x=>String(x.id)===btn.dataset.communityId);if(!r)return;
-    $("game").value=r.game;updateTracks();$("track").value=r.track;$("weather").value=r.weather;$("session").value=r.session;
-    put(r.setup||{});$("status").textContent="Assetto community caricato (non ancora salvato)";
-    showTab("setup");communityStatus("Assetto importato nell'editor. Controllalo e poi salvalo.");
-  }));
+  root.innerHTML=rows.map(r=>`<article class="community-item"><div><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.game)} · ${escapeHtml(r.track)} · ${escapeHtml(r.weather)} · ${escapeHtml(r.session)}</p><small>Codice: ${escapeHtml(String(r.id))}</small></div><div class="owner-actions"><button class="secondary" data-like-id="${escapeHtml(String(r.id))}">${likes[r.id]?"♥":"♡"} ${likes[r.id]?"Piace":"Mi piace"}</button><button class="secondary" data-community-id="${escapeHtml(String(r.id))}">Importa</button>${r.owner_id===currentCommunityUserId?`<button class="danger" data-delete-community-id="${escapeHtml(String(r.id))}">Elimina</button>`:""}</div></article>`).join("");
+  root.querySelectorAll("[data-community-id]").forEach(btn=>btn.addEventListener("click",()=>{const r=rows.find(x=>String(x.id)===btn.dataset.communityId);if(!r)return;$("game").value=r.game;updateTracks();$("track").value=r.track;$("weather").value=r.weather;$("session").value=r.session;put(r.setup||{});$("status").textContent="Assetto community caricato (non ancora salvato)";showTab("setup");communityStatus("Assetto importato nell'editor. Controllalo e poi salvalo.");}));
+  root.querySelectorAll("[data-delete-community-id]").forEach(btn=>btn.addEventListener("click",async()=>{const id=btn.dataset.deleteCommunityId;if(!confirm("Vuoi eliminare definitivamente questo tuo assetto dalla Community?"))return;btn.disabled=true;try{await communityRequest("community_setups?id=eq."+encodeURIComponent(id)+"&owner_id=eq."+encodeURIComponent(currentCommunityUserId),{method:"DELETE"});communityStatus("Il tuo assetto è stato eliminato dalla Community.");await loadCommunity();}catch(e){communityStatus("Non è stato possibile eliminare l'assetto: "+e.message,true);btn.disabled=false;}}));
   root.querySelectorAll("[data-like-id]").forEach(btn=>btn.addEventListener("click",()=>{const l=localLikes(),id=btn.dataset.likeId;if(l[id])delete l[id];else l[id]=true;localStorage.setItem(LOCAL_LIKES_KEY,JSON.stringify(l));renderCommunity();}));
 }
 async function loadCommunity(){
-  try{
-    const rows=await communityRequest("community_setups?select=id,title,game,track,weather,session,setup,created_at&order=created_at.desc&limit=50");
-    communityRows=Array.isArray(rows)?rows:[];renderCommunity();
-    communityStatus(`Community aggiornata: ${communityRows.length} assetti caricati.`);
-  }catch(e){$("communityList").innerHTML="<p class='muted'>"+escapeHtml(e.message)+"</p>";}
+  if(!supabaseClient){initCommunityClient();}
+  if(!currentCommunityUserId){renderCommunity();return;}
+  try{const rows=await communityRequest("community_setups?select=id,title,game,track,weather,session,setup,owner_id,created_at&order=created_at.desc&limit=50");communityRows=Array.isArray(rows)?rows:[];renderCommunity();communityStatus(`Community aggiornata: ${communityRows.length} assetti caricati.`);}catch(e){$("communityList").innerHTML="<p class='muted'>"+escapeHtml(e.message)+"</p>";}
 }
-$("communitySearch")?.addEventListener("input",renderCommunity);
-$("filterGame")?.addEventListener("change",renderCommunity);
-$("filterWeather")?.addEventListener("change",renderCommunity);
-let communityRefreshTimer=null;
-
+$("publishCommunity")?.addEventListener("click",async()=>{try{const session=await getCommunitySession();const title=$("communityTitle").value.trim();if(!title)throw Error("Inserisci un titolo per l'assetto.");const payload={title,game:$("game").value,track:$("track").value,weather:$("weather").value,session:$("session").value,setup:fields(),owner_id:session.user.id};await communityRequest("community_setups",{method:"POST",body:JSON.stringify(payload)});$("communityTitle").value="";communityStatus("Assetto pubblicato nella Community.");await loadCommunity();}catch(e){communityStatus("Pubblicazione non riuscita: "+e.message,true);}});
+$("communitySearch")?.addEventListener("input",renderCommunity);$("filterGame")?.addEventListener("change",renderCommunity);$("filterWeather")?.addEventListener("change",renderCommunity);$("refreshCommunity")?.addEventListener("click",loadCommunity);
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-$("refreshCommunity")?.addEventListener("click",loadCommunity);
-function showTab(name){
-  document.querySelectorAll(".tab-page").forEach(p=>p.hidden=p.id!=="page-"+name);
-  document.querySelectorAll(".tab-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
-  if(communityRefreshTimer){clearInterval(communityRefreshTimer);communityRefreshTimer=null;}
-  if(name==="community"){
-    loadCommunity();
-    communityRefreshTimer=setInterval(()=>{if(!document.hidden&&!$("page-community").hidden)loadCommunity();},30000);
-  }
-  window.scrollTo({top:0,behavior:"smooth"});
-}
+function showTab(name){document.querySelectorAll(".tab-page").forEach(p=>p.hidden=p.id!=="page-"+name);document.querySelectorAll(".tab-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));if(communityRefreshTimer){clearInterval(communityRefreshTimer);communityRefreshTimer=null;}if(name==="community"){loadCommunity();communityRefreshTimer=setInterval(()=>{if(!document.hidden&&!$("page-community").hidden&&currentCommunityUserId)loadCommunity();},30000);}window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll(".tab-button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
 refreshCommunityConfig();
+if(communityConfig().url&&communityConfig().key){const c=initCommunityClient();if(c)c.auth.getSession().then(({data,error})=>{if(!error){updateCommunityAuthUI(data.session);if(data.session)loadCommunity();}}).catch(()=>{});}else updateCommunityAuthUI(null);
 
 </script>
 </body></html>
