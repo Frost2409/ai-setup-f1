@@ -3,25 +3,53 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI SETUP F1</title>
+<title>AI SETUP F1 · Garage & Community</title>
 <style>
-:root{--bg:#090b14;--panel:#121629;--panel2:#191f36;--line:#2b3557;--text:#f3f5ff;--muted:#aab3d0;--blue:#4aa3ff;--purple:#9b70ff;--green:#48d6a0}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0%,#20204a 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif}
-header{padding:26px max(22px,calc((100% - 1120px)/2));border-bottom:1px solid var(--line);background:#0b0e1bdc}
-h1{margin:0;font-size:28px;letter-spacing:1.5px}header p{margin:4px 0 0;color:var(--muted)}
-main{max-width:1120px;margin:24px auto;padding:0 18px 50px}.hero{background:linear-gradient(110deg,#18264b,#251b46);border:1px solid #3c4772;border-radius:18px;padding:22px;margin-bottom:18px}
-.hero strong{font-size:19px}.tag{display:inline-block;color:#d9d0ff;background:#49347d;padding:3px 9px;border-radius:20px;font-size:12px;margin-left:8px}
-.layout{display:grid;grid-template-columns:300px 1fr;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
-h2{font-size:17px;margin:0 0 14px}label{display:block;color:var(--muted);font-size:13px;margin:12px 0 5px}
-select,input{width:100%;background:#0c1020;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px;font:inherit}
-button{border:0;border-radius:10px;padding:10px 14px;background:linear-gradient(100deg,var(--blue),var(--purple));color:white;font-weight:650;cursor:pointer}
-button.secondary{background:#252d49;border:1px solid var(--line)}button.danger{background:#542b43}
-.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.notice{font-size:12px;color:var(--muted);margin-top:12px}
-.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.group{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
-.group h3{font-size:14px;margin:0 0 8px;color:#c7caff}.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fields label{margin:4px 0 3px;font-size:12px}
-.status{color:var(--green);font-size:12px}.coach{margin-top:18px;background:linear-gradient(135deg,#172341,#211b3c);border:1px solid #465080;border-radius:15px;padding:16px}.coach-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.coach label{margin-top:8px}.coach-result{white-space:pre-wrap;background:#0c1020;border:1px solid var(--line);padding:12px;border-radius:10px;margin-top:12px;color:#e6eaff}.saved{margin-top:16px}.saved-item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+
+:root{--bg:#080d18;--panel:#111b2d;--panel2:#182640;--line:#2b4162;--text:#f3f6ff;--muted:#aab8d0;--blue:#42a5ff;--purple:#9875ff;--green:#55ddb0}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0%,#1b2c52 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Arial,sans-serif}
+header{padding:22px max(18px,calc((100% - 1120px)/2));border-bottom:1px solid var(--line);background:#0a1221}
+h1{margin:0;font-size:27px;letter-spacing:1px}header p{margin:4px 0 0;color:var(--muted)}
+main{max-width:1120px;margin:22px auto;padding:0 16px 50px}
+.hero{background:linear-gradient(110deg,#182d50,#2a2050);border:1px solid #3c5682;border-radius:18px;padding:20px;margin-bottom:16px}
+.hero strong{font-size:19px}.tag{display:inline-block;color:#e3dcff;background:#49347d;padding:3px 9px;border-radius:20px;font-size:12px;margin-left:8px}
+.tabs{max-width:1120px;margin:18px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+.tab-button{background:#182640;border:1px solid var(--line);color:#dce8ff;padding:11px 16px;border-radius:12px;min-height:44px}
+.tab-button.active{background:linear-gradient(100deg,#247fc7,#7055c9);border-color:#719cff;color:white}
+.tab-page[hidden]{display:none!important}
+.layout{display:grid;grid-template-columns:1fr;gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0;margin-bottom:14px}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:14px;margin:0 0 8px;color:#d0d8ff}
+label{display:block;color:var(--muted);font-size:13px;margin:12px 0 5px}
+select,input{width:100%;background:#0c1424;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:11px;font:inherit;min-height:42px}
+button{border:0;border-radius:10px;padding:11px 15px;background:linear-gradient(100deg,var(--blue),var(--purple));color:white;font-weight:650;cursor:pointer;min-height:44px}
+button.secondary{background:#253651;border:1px solid var(--line)}button.danger{background:#542b43}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.notice,.muted{font-size:13px;color:var(--muted);margin-top:10px}
+.groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.group{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}.fields label{margin:4px 0 3px;font-size:12px}
+.status{color:var(--green);font-size:12px}
+.coach{background:linear-gradient(135deg,#172b48,#241d43);border:1px solid #465b86;border-radius:15px;padding:18px}
+.coach-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.coach label{margin-top:8px}.coach-result{white-space:pre-wrap;background:#0c1424;border:1px solid var(--line);padding:12px;border-radius:10px;margin-top:12px;color:#e6eaff}
+.saved-item,.community-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}
+.community-item p{margin:3px 0;color:var(--muted)}.community-item small{color:#8ea2c4}
+.community-config{background:#0c1424;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.notice-box{background:#302716;border:1px solid #72572b;border-radius:12px;padding:12px;color:#f7dfac;font-size:13px}
 footer{color:var(--muted);font-size:12px;margin-top:18px}
-@media(max-width:760px){.layout{grid-template-columns:1fr}.groups{grid-template-columns:1fr}.coach-grid{grid-template-columns:1fr}}
+@media(max-width:760px){
+  header{padding:18px 14px}h1{font-size:23px}
+  .tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0 12px}
+  .tab-button{padding:10px 8px;font-size:13px}
+  main{padding:0 12px 36px;margin:14px auto}
+  .groups,.coach-grid{grid-template-columns:1fr}
+  .panel{padding:14px}
+  .fields{grid-template-columns:1fr 1fr}
+  .community-item{align-items:flex-start}
+}
+
 </style>
 <style>
 
@@ -59,45 +87,102 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
 <link rel="apple-touch-icon" href="icon-192.png">
 
 </head>
+
 <body>
-<header><h1>🏁 AI SETUP F1</h1><p>Setup manager offline · Windows 10 · F1 25 · Season 2025 / 2026 Season Pack</p></header>
+<header><h1>🏁 AI SETUP F1</h1><p>Il tuo garage digitale · F1 25 e F1 25 + 2026 Season Pack</p></header>
+<nav class="tabs" aria-label="Sezioni app">
+  <button class="tab-button active" data-tab="garage">🏠 Garage</button>
+  <button class="tab-button" data-tab="setup">⚙️ Crea assetto</button>
+  <button class="tab-button" data-tab="engineer">🧠 Ingegnere AI</button>
+  <button class="tab-button" data-tab="community">🌐 Community</button>
+  <button class="tab-button" data-tab="backup">💾 Backup</button>
+</nav>
 <main>
-<div class="hero"><strong>Il tuo garage virtuale</strong><span class="tag">OFFLINE</span><p style="color:#d4d9f4;margin:7px 0 0">Crea, modifica e salva configurazioni per ogni circuito, sessione e condizione meteo. Il 2026 è gestito come espansione di F1 25, non come gioco separato.</p></div>
-<div class="layout">
-<aside class="panel">
-<h2>Seleziona sessione</h2>
-<label for="game">Gioco</label><select id="game"><option value="F1 25 (stagione 2025)">F1 25 · Stagione 2025</option><option value="F1 25 + 2026 Season Pack">F1 25 · 2026 Season Pack</option></select>
-<label for="track">Circuito</label><select id="track"></select>
-<label for="weather">Meteo</label><select id="weather"><option>Asciutto</option><option>Bagnato</option></select>
-<label for="session">Sessione</label><select id="session"><option>Qualifica</option><option>Gara</option><option>Sprint</option></select>
-<div class="actions"><button id="load">Carica assetto</button><button class="secondary" id="clear">Nuovo</button></div>
-<div class="notice">Puoi creare tutte le varianti che vuoi. Le configurazioni salvate sono locali al browser e al dispositivo.</div>
-<div class="saved"><h2>Assetti salvati</h2><div id="savedList"></div></div>
-</aside>
-<section class="panel">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">Valori dell'assetto</h2><span class="status" id="status">Nuova configurazione</span></div>
-<p class="notice">Inserisci i valori previsti dal menu assetto del gioco. Le unità e gli intervalli possono variare tra F1 25 e F1 26.</p>
-<div class="groups" id="groups"></div>
-<div class="actions"><button id="save">Salva assetto</button><button class="secondary" id="export">Esporta backup JSON</button><button class="secondary" id="importBtn">Importa backup JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div>
-<section class="coach">
-<h2>🧠 Ingegnere di pista AI · Feedback del pilota</h2>
-<p class="notice">Descrivi cosa senti al volante. L'assistente propone modifiche ragionate all'assetto attualmente caricato; applicale una alla volta e verifica in pista.</p>
-<div class="coach-grid">
-<div><label for="balance">Comportamento generale</label><select id="balance"><option value="neutral">Bilanciata</option><option value="under">Sottosterzo: non gira abbastanza</option><option value="over">Sovrasterzo: il posteriore scappa</option></select></div>
-<div><label for="phase">Quando succede?</label><select id="phase"><option value="entry">Ingresso curva / frenata</option><option value="mid">Centro curva</option><option value="exit">Uscita curva / accelerazione</option><option value="straight">Rett rettilineo / alta velocità</option><option value="all">In più fasi</option></select></div>
-<div><label for="corner">Tipo di curva</label><select id="corner"><option value="slow">Curve lente e tornanti</option><option value="medium">Curve medie</option><option value="fast">Curve veloci</option><option value="all">Tutte</option></select></div>
-<div><label for="severity">Intensità del problema</label><select id="severity"><option value="mild">Leggera</option><option value="medium">Media</option><option value="strong">Forte</option></select></div>
-<div><label for="braking">In frenata</label><select id="braking"><option value="ok">Stabile</option><option value="lock">Si bloccano le ruote</option><option value="rear">Il retrotreno si muove</option><option value="long">La macchina non rallenta abbastanza</option></select></div>
-<div><label for="traction">In uscita</label><select id="traction"><option value="ok">Buona trazione</option><option value="spin">Perdo trazione / pattina</option><option value="snap">Scoda improvvisamente</option><option value="slow">Esce lenta dalla curva</option></select></div>
-</div>
-<label for="notes">Altre sensazioni (facoltativo)</label><input id="notes" placeholder="Es. instabile nelle curve 1 e 2, gomme posteriori calde...">
-<div class="actions"><button id="coachBtn">Analizza feedback</button><button class="secondary" id="applyCoach" disabled>Applica suggerimenti ai valori</button></div>
-<div class="coach-result" id="coachResult" aria-live="polite">Compila le sensazioni e premi “Analizza feedback”.</div>
-<p class="notice">L'assistente usa regole tecniche indicative, non legge telemetria o sensazioni direttamente dalla console. I suggerimenti dipendono dal modello di gioco e vanno testati: non applicare più cambiamenti insieme se vuoi capire quale funziona.</p>
-</section>
-<footer>Nota: questa versione contiene l’elenco dei circuiti e un archivio per le varianti, ma non una banca dati di valori già verificati. Inserisci valori provati in gioco: il programma non inventa setup e non modifica il gioco.</footer>
-</section>
-</div></main>
+  <section class="tab-page" id="page-garage">
+    <div class="hero"><strong>Benvenuto nel tuo garage virtuale</strong><span class="tag">F1 25 / 2026 PACK</span><p style="color:#d4dff5;margin:7px 0 0">Organizza gli assetti per circuito, meteo e sessione. Crea una configurazione, analizza il comportamento della vettura e condividi i tuoi setup con la community.</p></div>
+    <section class="panel">
+      <h2>Seleziona la configurazione</h2>
+      <div class="layout">
+        <div>
+          <label for="game">Gioco</label><select id="game"><option value="F1 25 (stagione 2025)">F1 25 · Stagione 2025</option><option value="F1 25 + 2026 Season Pack">F1 25 · 2026 Season Pack</option></select>
+        </div>
+        <div>
+          <label for="track">Circuito</label><select id="track"></select>
+        </div>
+        <div>
+          <label for="weather">Meteo</label><select id="weather"><option>Asciutto</option><option>Bagnato</option></select>
+        </div>
+        <div>
+          <label for="session">Sessione</label><select id="session"><option>Qualifica</option><option>Gara</option><option>Sprint</option></select>
+        </div>
+      </div>
+      <div class="actions"><button id="load">Carica assetto</button><button class="secondary" id="clear">Nuovo assetto</button></div>
+    </section>
+    <section class="panel"><h2>Il mio archivio</h2><p class="muted">Gli assetti salvati qui restano su questo dispositivo. Per trasferirli usa Backup o Community.</p><div id="savedList"></div></section>
+  </section>
+
+  <section class="tab-page" id="page-setup" hidden>
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">⚙️ Editor assetto</h2><span class="status" id="status">Nuova configurazione</span></div>
+      <p class="notice">Inserisci i valori esattamente come compaiono nel menu assetto del gioco. Gli intervalli possono variare.</p>
+      <div class="groups" id="groups"></div>
+      <div class="actions"><button id="save">Salva nel mio garage</button></div>
+    </section>
+  </section>
+
+  <section class="tab-page" id="page-engineer" hidden>
+    <section class="panel">
+      <section class="coach">
+        <h2>🧠 Ingegnere di pista AI</h2>
+        <p class="notice">Descrivi cosa senti al volante. L'assistente propone modifiche indicative all'assetto attualmente caricato; applicale una alla volta e verifica in pista.</p>
+        <div class="coach-grid">
+          <div><label for="balance">Comportamento generale</label><select id="balance"><option value="neutral">Bilanciata</option><option value="under">Sottosterzo: non gira abbastanza</option><option value="over">Sovrasterzo: il posteriore scappa</option></select></div>
+          <div><label for="phase">Quando succede?</label><select id="phase"><option value="entry">Ingresso curva / frenata</option><option value="mid">Centro curva</option><option value="exit">Uscita curva / accelerazione</option><option value="straight">Rettilineo / alta velocità</option><option value="all">In più fasi</option></select></div>
+          <div><label for="corner">Tipo di curva</label><select id="corner"><option value="slow">Curve lente e tornanti</option><option value="medium">Curve medie</option><option value="fast">Curve veloci</option><option value="all">Tutte</option></select></div>
+          <div><label for="severity">Intensità del problema</label><select id="severity"><option value="mild">Leggera</option><option value="medium">Media</option><option value="strong">Forte</option></select></div>
+          <div><label for="braking">In frenata</label><select id="braking"><option value="ok">Stabile</option><option value="lock">Si bloccano le ruote</option><option value="rear">Il retrotreno si muove</option><option value="long">La macchina non rallenta abbastanza</option></select></div>
+          <div><label for="traction">In uscita</label><select id="traction"><option value="ok">Buona trazione</option><option value="spin">Perdo trazione / pattina</option><option value="snap">Scoda improvvisamente</option><option value="slow">Esce lenta dalla curva</option></select></div>
+        </div>
+        <label for="notes">Altre sensazioni (facoltativo)</label><input id="notes" placeholder="Es. instabile nelle curve lente...">
+        <div class="actions"><button id="coachBtn">Analizza feedback</button><button class="secondary" id="applyCoach" disabled>Applica suggerimenti</button></div>
+        <div class="coach-result" id="coachResult" aria-live="polite">Compila le sensazioni e premi “Analizza feedback”.</div>
+        <p class="notice">L'assistente usa regole tecniche indicative: non legge telemetria né comunica direttamente con la PS5. I suggerimenti vanno testati.</p>
+      </section>
+    </section>
+  </section>
+
+  <section class="tab-page" id="page-community" hidden>
+    <section class="panel">
+      <h2>🌐 Community setup</h2>
+      <p class="muted">Qui potrai pubblicare i tuoi assetti e scaricare quelli condivisi dagli altri giocatori, senza mostrare nome, email o altri dati personali.</p>
+      <div class="notice-box"><strong>Collegamento da completare:</strong> GitHub Pages ospita l'app ma non conserva un archivio condiviso. Per la community serve un database online separato. Possiamo collegare un progetto Supabase gratuito; finché non viene configurato, la condivisione online non è attiva.</div>
+      <div class="community-config">
+        <h3>Collega il database della community</h3>
+        <label for="supabaseUrl">URL progetto Supabase</label><input id="supabaseUrl" type="url" placeholder="https://xxxx.supabase.co">
+        <label for="supabaseKey">Chiave anon / publishable del progetto</label><input id="supabaseKey" type="password" placeholder="Incolla la chiave pubblica del progetto">
+        <div class="actions"><button id="saveCommunityConfig">Salva collegamento</button><button class="secondary" id="testCommunity">Verifica connessione</button></div>
+        <p class="notice">La chiave pubblica è destinata all'uso nel browser. Non inserire mai service_role, password o chiavi segrete. Le regole del database devono limitare i dati pubblicabili.</p>
+      </div>
+      <h3>Condividi l'assetto attualmente selezionato</h3>
+      <label for="communityTitle">Titolo pubblico (non usare nome, email o dati personali)</label><input id="communityTitle" maxlength="50" placeholder="Es. Monza asciutto - gara">
+      <div class="actions"><button id="publishCommunity">Pubblica assetto online</button><button class="secondary" id="refreshCommunity">Aggiorna elenco community</button></div>
+      <p id="communityStatus" class="status" aria-live="polite">Community non ancora configurata.</p>
+      <h3 style="margin-top:22px">Assetti condivisi dagli altri</h3>
+      <div id="communityList"><p class="muted">Configura il database e premi “Aggiorna elenco community”.</p></div>
+    </section>
+  </section>
+
+  <section class="tab-page" id="page-backup" hidden>
+    <section class="panel">
+      <h2>💾 Backup e trasferimento</h2>
+      <p class="muted">Esporta una copia dei tuoi assetti o importa un backup ricevuto. Il backup può essere trasferito tra dispositivi.</p>
+      <div class="actions"><button id="export">Esporta backup JSON</button><button class="secondary" id="importBtn">Importa backup JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden></div>
+      <p class="notice">I salvataggi locali non si sincronizzano automaticamente tra telefoni. Usa il backup o la community online per trasferirli.</p>
+    </section>
+  </section>
+  <footer>AI SETUP F1 · F1 25 e F1 25 + 2026 Season Pack. I setup condivisi sono contributi degli utenti e vanno verificati in gioco prima di usarli.</footer>
+</main>
+
 <script>
 const tracks2025=["Australia · Melbourne","Cina · Shanghai","Giappone · Suzuka","Bahrain · Sakhir","Arabia Saudita · Jeddah","USA · Miami","Italia · Imola","Monaco · Monte Carlo","Spagna · Barcellona","Canada · Montreal","Austria · Spielberg","Gran Bretagna · Silverstone","Belgio · Spa-Francorchamps","Ungheria · Budapest","Olanda · Zandvoort","Italia · Monza","Azerbaijan · Baku","Singapore · Marina Bay","USA · Austin (COTA)","Messico · Città del Messico","Brasile · Interlagos","USA · Las Vegas","Qatar · Lusail","Abu Dhabi · Yas Marina","Silverstone · Reverse","Austria · Reverse","Zandvoort · Reverse"];
 const tracks2026=["Australia · Melbourne","Cina · Shanghai","Giappone · Suzuka","Bahrain · Sakhir","Arabia Saudita · Jeddah","USA · Miami","Canada · Montreal","Monaco · Monte Carlo","Spagna · Barcellona","Austria · Spielberg","Gran Bretagna · Silverstone","Belgio · Spa-Francorchamps","Ungheria · Budapest","Olanda · Zandvoort","Italia · Monza","Spagna · Madrid (MADRING)","Azerbaijan · Baku","Singapore · Marina Bay","USA · Austin (COTA)","Messico · Città del Messico","Brasile · Interlagos","USA · Las Vegas","Qatar · Lusail","Abu Dhabi · Yas Marina","Italia · Imola (pista extra)"];
@@ -131,6 +216,84 @@ render();
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }
-</script>
 
+// Community sharing: requires a Supabase project configured by the owner.
+const COMMUNITY_CONFIG_KEY = "aisetupf1_community_config";
+function communityConfig(){ try{return JSON.parse(localStorage.getItem(COMMUNITY_CONFIG_KEY)||"{}")}catch{return {}} }
+function communityStatus(message, bad=false){
+  const el=$("communityStatus");
+  if(el){el.textContent=message;el.style.color=bad?"#ff9aa9":"var(--green)"}
+}
+function refreshCommunityConfig(){
+  const c=communityConfig();
+  if($("supabaseUrl"))$("supabaseUrl").value=c.url||"";
+  if($("supabaseKey"))$("supabaseKey").value=c.key||"";
+  communityStatus(c.url&&c.key?"Configurazione inserita. Premi “Verifica connessione”.":"Per condividere online serve collegare un database gratuito Supabase.");
+}
+$("saveCommunityConfig")?.addEventListener("click",()=>{
+  const url=$("supabaseUrl").value.trim().replace(/\/+$/,"");
+  const keyVal=$("supabaseKey").value.trim();
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)||keyVal.length<20){
+    communityStatus("Indirizzo o chiave non validi. Controlla i dati del progetto Supabase.",true);return;
+  }
+  localStorage.setItem(COMMUNITY_CONFIG_KEY,JSON.stringify({url,key:keyVal}));
+  communityStatus("Configurazione salvata su questo dispositivo. Ora verifica la connessione.");
+});
+async function communityRequest(path, options={}){
+  const c=communityConfig();
+  if(!c.url||!c.key)throw Error("Prima configura il collegamento a Supabase.");
+  const response=await fetch(c.url+"/rest/v1/"+path,{
+    ...options,
+    headers:{
+      "apikey":c.key,"Authorization":"Bearer "+c.key,
+      "Content-Type":"application/json","Prefer":options.method==="POST"?"return=representation":"",...(options.headers||{})
+    }
+  });
+  if(!response.ok)throw Error("Il server ha risposto con errore "+response.status+". Controlla tabella e permessi.");
+  return response.status===204?[]:await response.json();
+}
+$("testCommunity")?.addEventListener("click",async()=>{
+  try{await communityRequest("community_setups?select=id&limit=1");communityStatus("Connessione riuscita! La community è raggiungibile.");}
+  catch(e){communityStatus(e.message,true);}
+});
+$("publishCommunity")?.addEventListener("click",async()=>{
+  try{
+    const title=$("communityTitle").value.trim();
+    if(!title||title.length>50)throw Error("Inserisci un titolo da 1 a 50 caratteri.");
+    const payload={
+      title,game:$("game").value,track:$("track").value,weather:$("weather").value,
+      session:$("session").value,setup:fields()
+    };
+    const rows=await communityRequest("community_setups",{method:"POST",body:JSON.stringify(payload)});
+    communityStatus("Assetto condiviso con la community! Codice: "+(rows[0]?.id||"pubblicato"));
+    $("communityTitle").value="";
+    await loadCommunity();
+  }catch(e){communityStatus(e.message,true);}
+});
+async function loadCommunity(){
+  try{
+    const rows=await communityRequest("community_setups?select=id,title,game,track,weather,session,setup,created_at&order=created_at.desc&limit=50");
+    const root=$("communityList");
+    if(!rows.length){root.innerHTML="<p class='muted'>Non ci sono ancora assetti condivisi. Puoi essere il primo!</p>";return;}
+    root.innerHTML=rows.map(r=>`<article class="community-item"><div><strong>${escapeHtml(r.title)}</strong><p>${escapeHtml(r.game)} · ${escapeHtml(r.track)} · ${escapeHtml(r.weather)} · ${escapeHtml(r.session)}</p><small>Codice: ${escapeHtml(String(r.id))}</small></div><button class="secondary" data-community-id="${escapeHtml(String(r.id))}">Importa</button></article>`).join("");
+    root.querySelectorAll("[data-community-id]").forEach(btn=>btn.addEventListener("click",()=>{
+      const r=rows.find(x=>String(x.id)===btn.dataset.communityId);if(!r)return;
+      $("game").value=r.game;updateTracks();$("track").value=r.track;$("weather").value=r.weather;$("session").value=r.session;
+      put(r.setup||{});$("status").textContent="Assetto community caricato (non ancora salvato)";
+      showTab("setup");communityStatus("Assetto importato nell'editor. Controllalo e poi salvalo.");
+    }));
+  }catch(e){$("communityList").innerHTML="<p class='muted'>"+escapeHtml(e.message)+"</p>";}
+}
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+$("refreshCommunity")?.addEventListener("click",loadCommunity);
+function showTab(name){
+  document.querySelectorAll(".tab-page").forEach(p=>p.hidden=p.id!=="page-"+name);
+  document.querySelectorAll(".tab-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  if(name==="community")loadCommunity();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".tab-button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+refreshCommunityConfig();
+
+</script>
 </body></html>
