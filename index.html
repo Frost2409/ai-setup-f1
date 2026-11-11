@@ -124,6 +124,12 @@ button, input[type="button"], input[type="submit"] { min-height: 44px; }
   </section>
 
   <section class="tab-page" id="page-setup" hidden>
+    <section class="panel" style="border-color:#526da0;background:linear-gradient(120deg,#14233b,#191d38)">
+      <h2>🏎️ Generatore assetto per circuito</h2>
+      <p class="muted">Crea una base dedicata al circuito selezionato, adattata a meteo e sessione. Seleziona gioco, pista, meteo e sessione nel Garage, poi genera qui il tuo assetto.</p>
+      <div class="actions"><button id="generateSetup">✨ Genera assetto per questo circuito</button><button class="secondary" id="goGarage">Modifica circuito / meteo</button></div>
+      <p class="notice" id="generatorStatus">Nessun assetto generato. Le impostazioni si trovano nella sezione Garage.</p>
+    </section>
     <section class="panel">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="margin:0">⚙️ Editor assetto</h2><span class="status" id="status">Nuova configurazione</span></div>
       <p class="notice">Inserisci i valori esattamente come compaiono nel menu assetto del gioco. Gli intervalli possono variare.</p>
@@ -263,17 +269,53 @@ $("coachBtn").addEventListener("click",()=>{
 $("applyCoach").addEventListener("click",()=>{
   if(!coachChanges)return;const values=fields();Object.entries(coachChanges).forEach(([name,v])=>values[name]=String(v.next));put(values);$("status").textContent="Suggerimenti Ingegnere applicati · non ancora salvato";$("applyCoach").disabled=true;showTab("setup");
 });
-$("generateBase").addEventListener("click",()=>{
-  const track=$("track").value.toLowerCase(),wet=$("weather").value==="Bagnato",race=$("session").value!=="Qualifica";
-  const low=/monza|baku|las vegas|spa|silverstone|jeddah/.test(track),high=/monaco|hungar|singapore|zandvoort|madrid/.test(track);
-  let front=low?18:high?42:30, rear=low?22:high?48:34;
-  if(wet){front+=4;rear+=5;}
-  const base={"Ala anteriore":front,"Ala posteriore":rear,"Differenziale in accelerazione":wet?48:race?52:58,"Differenziale in rilascio":wet?48:52,"Freno motore":wet?45:55,"Campanatura anteriore":-3.0,"Campanatura posteriore":-1.5,"Convergenza anteriore":0.05,"Convergenza posteriore":0.20,"Sospensione anteriore":wet?25:32,"Sospensione posteriore":wet?8:10,"Barra antirollio anteriore":wet?7:10,"Barra antirollio posteriore":wet?5:8,"Altezza anteriore":wet?24:22,"Altezza posteriore":wet?48:45,"Pressione freni":wet?96:100,"Ripartizione frenata":wet?56:55,"Pressione anteriore sinistra":wet?23.0:24.0,"Pressione anteriore destra":wet?23.0:24.0,"Pressione posteriore sinistra":wet?21.5:22.5,"Pressione posteriore destra":wet?21.5:22.5};
-  base["Ripartizione frenata"]=wet?56:55;
-  put(base);coachChanges=null;$("applyCoach").disabled=true;$("status").textContent="Base generata dall'Ingegnere · non ancora salvata";
-  $("coachResult").textContent=`Base indicativa generata per ${$("track").value}, ${$("weather").value.toLowerCase()}, ${$("session").value.toLowerCase()}.\nCarico aerodinamico: ${low?"basso":high?"alto":"medio"}.\nControlla tutti gli intervalli nel gioco, poi salva nel Garage. Questa è una base euristica, non un setup telemetrico verificato.`;
-  showTab("setup");
-});
+function generateTrackSetup(){
+  const track=$("track").value;
+  const wet=$("weather").value==="Bagnato";
+  const session=$("session").value;
+  const isRace=session!=="Qualifica";
+  // Profili distinti per ogni tracciato: carico aerodinamico e piattaforma dedicati.
+  const profiles=[
+    [/Melbourne|Australia/i,32,35,31,10], [/Shanghai|Cina/i,34,37,32,10],
+    [/Suzuka|Giappone/i,30,34,30,9], [/Sakhir|Bahrain/i,28,32,29,9],
+    [/Jeddah|Arabia Saudita/i,22,26,28,8], [/Miami/i,30,34,30,9],
+    [/Imola/i,31,35,31,10], [/Monaco/i,48,50,39,13],
+    [/Barcellona/i,36,39,34,11], [/Montreal|Canada/i,25,29,28,8],
+    [/Spielberg|Austria/i,27,31,29,9], [/Silverstone/i,31,35,32,10],
+    [/Spa-Francorchamps|Belgio/i,21,25,27,8], [/Budapest|Ungheria/i,43,46,36,12],
+    [/Zandvoort|Olanda/i,40,44,36,12], [/Monza/i,18,22,25,7],
+    [/Baku|Azerbaijan/i,19,24,26,7], [/Singapore/i,48,50,39,13],
+    [/Austin|COTA/i,32,36,32,10], [/Città del Messico|Messico/i,39,43,35,11],
+    [/Interlagos|Brasile/i,32,36,32,10], [/Las Vegas/i,17,21,25,7],
+    [/Lusail|Qatar/i,35,39,34,11], [/Yas Marina|Abu Dhabi/i,30,34,31,9],
+    [/MADRING|Madrid/i,39,43,36,12], [/Reverse/i,30,34,31,10]
+  ];
+  const profile=profiles.find(x=>x[0].test(track))||[/./,31,35,31,10];
+  let [_,front,rear,suspFront,arbFront]=profile;
+  if(wet){front+=3;rear+=4;suspFront-=3;}
+  if(isRace){front-=1;rear-=1;}
+  const base={
+    "Ala anteriore":front,"Ala posteriore":rear,
+    "Differenziale in accelerazione":wet?48:(isRace?52:58),
+    "Differenziale in rilascio":wet?48:52,"Freno motore":wet?45:55,
+    "Campanatura anteriore":-3.0,"Campanatura posteriore":-1.5,
+    "Convergenza anteriore":0.05,"Convergenza posteriore":0.20,
+    "Sospensione anteriore":suspFront,"Sospensione posteriore":wet?7:10,
+    "Barra antirollio anteriore":wet?Math.max(5,arbFront-2):arbFront,
+    "Barra antirollio posteriore":wet?6:8,
+    "Altezza anteriore":wet?25:22,"Altezza posteriore":wet?49:45,
+    "Pressione freni":wet?96:100,"Ripartizione frenata":wet?56:55,
+    "Pressione anteriore sinistra":wet?23.0:24.0,"Pressione anteriore destra":wet?23.0:24.0,
+    "Pressione posteriore sinistra":wet?21.5:22.5,"Pressione posteriore destra":wet?21.5:22.5
+  };
+  put(base);coachChanges=null;$ ("applyCoach").disabled=true;
+  $("status").textContent="Assetto specifico generato · non ancora salvato";
+  $("generatorStatus").textContent=`Base generata per ${track} · ${$("weather").value} · ${session}. Controlla i valori nel gioco e premi “Salva nel mio garage” per conservarla.`;
+  $("coachResult").textContent=`Base dedicata generata per ${track}, ${$("weather").value.toLowerCase()}, ${session.toLowerCase()}.\nProfilo aerodinamico: ${front}/${rear}.\nÈ una base euristica specifica per pista, non un setup telemetrico verificato. Provala in pista e correggi un parametro alla volta.`;
+}
+$("generateBase").addEventListener("click",()=>{generateTrackSetup();showTab("setup");});
+$("generateSetup").addEventListener("click",generateTrackSetup);
+$("goGarage").addEventListener("click",()=>showTab("garage"));
 </script>
 
 <script>
